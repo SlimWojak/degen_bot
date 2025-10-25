@@ -1,0 +1,71 @@
+import os
+from decimal import Decimal, ROUND_DOWN
+
+from hyperliquid.exchange import Exchange
+from hyperliquid.info import Info
+from hyperliquid.utils import constants
+from hyperliquid.utils.signing import get_timestamp_ms
+
+def base_url():
+    return constants.MAINNET_API_URL if os.getenv("HL_ENV","mainnet").lower() == "mainnet" else constants.TESTNET_API_URL
+
+def to_wire_decimal_str(x: Decimal) -> str:
+    # format without trailing zeros, no scientific notation
+    s = f"{x.normalize():f}"
+    if "." in s:
+        s = s.rstrip("0").rstrip(".")
+    return s if s else "0"
+
+MASTER = os.environ["HL_ACCOUNT_ADDRESS"]
+AGENT  = os.environ["HL_API_WALLET_ADDRESS"]
+AGENT_PK = os.environ["HL_PRIVATE_KEY"]
+MASTER_PK = os.getenv("HL_MASTER_PRIVATE_KEY")
+
+print(f"[env] network={os.getenv('HL_ENV','mainnet')} master={MASTER} agent={AGENT}")
+
+# 1) (Optional) Re-approve agent via SDK using master key
+if MASTER_PK:
+    print("[approve] attempting SDK approve_agent from master…")
+    ex_master = Exchange(
+        {"account_address": MASTER, "secret_key": MASTER_PK},
+        base_url=base_url(),
+    )
+    # Name is arbitrary; using HL_API_WALLET for clarity
+    r = ex_master.approve_agent("HL_API_WALLET", AGENT)
+    print("[approve][resp]", r)
+
+r = ex_master.approve_agent(name="HL_API_WALLET", address=AGENT)# 2) Build SDK client (agent signs; master submits)
+ex = Exchange(
+    {"account_address": MASTER, "secret_key": AGENT_PK},
+    base_url=base_url(),
+)
+info = Info(base_url=base_url())
+
+# 3) Resolve asset id for BTC
+meta = info.meta()
+universe = meta["universe"]
+asset = next(i for i,u in enumerate(universe) if u["name"].upper()=="BTC")
+
+# 4) Compute a ~$12 notional size at current mid, with safe trimming
+snap = info.l2_snapshot("BTC")
+best = snap["levels"][0]
+mid = (Decimal(best["px"]) + Decimal(snap["levels"][1]["px"])) / Decimal("2")
+usd = Decimal("12")
+sz_dec = (usd / mid).quantize(Decimal("0.000001"), rounding=ROUND_DOWN)  # 6 dp
+sz = to_wire_decimal_str(sz_dec) or "0.000001"
+
+order_spec = {
+    "asset": asset,                # int
+    "is_buy": True,                # bool
+    "reduce_only": False,          # bool
+    "limit_px": "0",               # str "0" => market-style
+    "sz": sz,                      # str, no trailing zeros
+    "order_type": {"limit": {"tif": "Ioc"}},  # short-lived IOC
+}
+
+print("[order_spec]", order_spec)
+
+# 5) Place order
+resp = ex.order(order_spec)
+print("[order][raw]", resp)
+

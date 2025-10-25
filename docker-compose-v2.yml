@@ -1,0 +1,48 @@
+services:
+  bot:
+    build: 
+      context: .
+      dockerfile: bot/Dockerfile
+    container_name: degen-god-bot
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+      - ./bot:/app/bot
+      - ./common:/app/common
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  backend:
+    build: 
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: degen-god-backend
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./backend:/app/backend
+      - ./common:/app/common
+    # depends_on:
+    #   bot:
+    #     condition: service_healthy
+    restart: unless-stopped
+
+  webapp:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: degen-god-webapp
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped

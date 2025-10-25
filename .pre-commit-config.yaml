@@ -1,0 +1,31 @@
+# Pre-commit hooks - Phase ε.1 Purification Pass
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.0
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.7.1
+    hooks:
+      - id: mypy
+        additional_dependencies: [types-all]
+        args: [--strict, --ignore-missing-imports]
+
+  - repo: local
+    hooks:
+      - id: dependency-audit
+        name: dependency-audit
+        entry: python scripts/audit_deps.py
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      - id: deterministic-tests
+        name: deterministic-tests
+        entry: python tests/test_simple_truth.py
+        language: system
+        pass_filenames: false
+        always_run: true

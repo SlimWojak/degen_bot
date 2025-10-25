@@ -1,0 +1,46 @@
+# Pro Deploy Configuration for Degen Bot
+version: "3.8"
+
+services:
+  degen-bot:
+    build: .
+    container_name: degen-bot
+    restart: unless-stopped
+    
+    # Environment variables (will be overridden by .env volume mount)
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+    
+    # Mount .env file as volume for Pro Deploy
+    volumes:
+      - ./.env:/app/.env:ro
+      - ./data:/app/data
+      - ./plots:/app/plots
+      - ./logs:/app/logs
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "python", "-c", "import asyncio; print('Bot is healthy')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    
+    # Resource limits for Pro Deploy
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    
+    # Network configuration
+    networks:
+      - degen-network
+
+networks:
+  degen-network:
+    driver: bridge

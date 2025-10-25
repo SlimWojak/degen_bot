@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chart Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <style>
+        body { background: #1a1a1a; color: #00CFFF; font-family: Arial; margin: 20px; }
+        .chart-container { width: 100%; height: 400px; background: #2d3748; margin: 20px; }
+        #test-chart { width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+    <h1>Chart Test</h1>
+    <div class="chart-container">
+        <canvas id="test-chart"></canvas>
+    </div>
+    <div id="status">Loading...</div>
+    
+    <script>
+        console.log('Testing Chart.js...');
+        
+        const canvas = document.getElementById('test-chart');
+        console.log('Canvas found:', canvas);
+        
+        const ctx = canvas.getContext('2d');
+        
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Point 1', 'Point 2', 'Point 3'],
+                datasets: [{
+                    label: 'Portfolio Value',
+                    data: [10000, 10100, 10200],
+                    borderColor: '#00d395',
+                    backgroundColor: 'rgba(0, 211, 149, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.1,
+                    pointRadius: 3,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { color: '#2d3748', drawBorder: false },
+                        ticks: { color: '#8892b0', font: { size: 11 } }
+                    },
+                    y: {
+                        grid: { color: '#2d3748', drawBorder: false },
+                        ticks: {
+                            color: '#8892b0',
+                            font: { size: 11 },
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        console.log('Chart created:', chart);
+        document.getElementById('status').textContent = 'Chart created successfully!';
+    </script>
+</body>
+</html>

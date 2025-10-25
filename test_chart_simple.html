@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chart Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        body { background: #1a1a1a; color: #00CFFF; font-family: Arial; }
+        .chart-container { width: 100%; height: 400px; background: #2d3748; margin: 20px; }
+        #test-chart { width: 100%; height: 100%; }
+    </style>
+</head>
+<body>
+    <h1>Chart Test</h1>
+    <div class="chart-container">
+        <canvas id="test-chart"></canvas>
+    </div>
+    <div id="status">Loading...</div>
+    
+    <script>
+        console.log('Testing Chart.js with time adapter...');
+        
+        // Test data
+        const testData = [
+            { timestamp: '2025-10-24T10:00:00', value: 10000 },
+            { timestamp: '2025-10-24T11:00:00', value: 10100 },
+            { timestamp: '2025-10-24T12:00:00', value: 10200 },
+            { timestamp: '2025-10-24T13:00:00', value: 10150 },
+            { timestamp: '2025-10-24T14:00:00', value: 10300 }
+        ];
+        
+        const ctx = document.getElementById('test-chart').getContext('2d');
+        
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: testData.map(d => new Date(d.timestamp).toLocaleDateString()),
+                datasets: [{
+                    label: 'Portfolio Value',
+                    data: testData.map(d => ({
+                        x: new Date(d.timestamp),
+                        y: d.value
+                    })),
+                    borderColor: '#00d395',
+                    backgroundColor: 'rgba(0, 211, 149, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            displayFormats: {
+                                hour: 'HH:mm',
+                                day: 'MMM dd'
+                            }
+                        },
+                        grid: { color: '#2d3748', drawBorder: false },
+                        ticks: { color: '#8892b0', font: { size: 11 } }
+                    },
+                    y: {
+                        grid: { color: '#2d3748', drawBorder: false },
+                        ticks: {
+                            color: '#8892b0',
+                            font: { size: 11 },
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        console.log('Chart created:', chart);
+        document.getElementById('status').textContent = 'Chart created successfully!';
+    </script>
+</body>
+</html>

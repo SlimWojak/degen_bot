@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DegenGod V2 Trading Cockpit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="lib/dataClient.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header Bar -->
+        <header class="header-bar">
+            <div class="header-content">
+                <div class="portfolio-info">
+                    <span class="portfolio-value">Portfolio Value: <span id="portfolio-value">$124,850</span></span>
+                    <span class="daily-pnl">Daily P&L: <span id="daily-pnl">+$2,450 (+2.0%)</span></span>
+                </div>
+                        <div class="status-info">
+                            <span class="bot-status">Bot: <span id="bot-status">🟢 LIVE</span></span>
+                            <span class="market-status">Market: <span id="market-status">🟢 CONNECTED</span></span>
+                            <span class="api-status">API: <span id="api-status">🟢 HEALTHY</span></span>
+                            <span class="db-status">DB: <span id="db-status">🟢 SYNCED</span></span>
+                            <span class="ws-status">WS: <span id="ws-status">🟢 CONNECTED</span></span>
+                        </div>
+                        <div class="market-micro-info">
+                            <span class="micro-spread">Spread: <span id="micro-spread">-- bps</span></span>
+                            <span class="micro-obi">OBI: <span id="micro-obi">--</span></span>
+                            <span class="micro-rtn">5s RTN: <span id="micro-rtn">--%</span></span>
+                        </div>
+                <div class="control-bar">
+                    <div class="kill-switch">
+                        <label class="switch">
+                            <input type="checkbox" id="kill-switch-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span class="kill-switch-label">Kill Switch</span>
+                    </div>
+                        <div class="symbol-picker">
+                            <label for="symbol-select">Symbols:</label>
+                            <select id="symbol-select" multiple>
+                                <option value="BTC">BTC</option>
+                                <option value="ETH" selected>ETH</option>
+                                <option value="SOL">SOL</option>
+                                <option value="DOGE">DOGE</option>
+                                <option value="XRP">XRP</option>
+                                <option value="HYPE">HYPE</option>
+                            </select>
+                        </div>
+                        <div class="trade-controls">
+                            <button id="buy-btn" class="trade-btn buy-btn">Buy $15 IOC</button>
+                            <button id="sell-btn" class="trade-btn sell-btn">Sell $15 IOC</button>
+                            <button id="ai-btn" class="trade-btn ai-btn">Let AI Decide</button>
+                        </div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content Grid -->
+        <div class="main-grid">
+            <!-- Top Row -->
+            <div class="metrics-panel panel" data-widget="metrics">
+                <h3>Key Metrics</h3>
+                <div class="metrics-grid">
+                    <div class="metric-item">
+                        <span class="metric-label">Win Rate</span>
+                        <span class="metric-value" id="win-rate">64.2%</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Sharpe Ratio</span>
+                        <span class="metric-value" id="sharpe-ratio">1.8</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Max Drawdown</span>
+                        <span class="metric-value negative" id="max-drawdown">-8.4%</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Total Trades</span>
+                        <span class="metric-value" id="total-trades">47</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Active Trades</span>
+                        <span class="metric-value" id="active-trades">3</span>
+                    </div>
+                    <div class="metric-item">
+                        <span class="metric-label">Daily P&L</span>
+                        <span class="metric-value positive" id="daily-pnl-metric">+2.0%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chart-panel panel" data-widget="chart">
+                <div class="chart-header">
+                    <h3>Portfolio Equity</h3>
+                    <div class="chart-controls">
+                        <button class="time-btn active" data-period="1D">1D</button>
+                        <button class="time-btn" data-period="1W">1W</button>
+                        <button class="time-btn" data-period="1M">1M</button>
+                        <button class="time-btn" data-period="3M">3M</button>
+                        <button class="time-btn" data-period="All">All</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <!-- Custom SVG chart will be inserted here -->
+                </div>
+            </div>
+            
+            <div class="positions-panel panel" data-widget="positions">
+                <h3>Active Positions</h3>
+                <div class="table-container">
+                    <table class="positions-table">
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Side</th>
+                                <th>Size</th>
+                                <th>Entry</th>
+                                <th>Current</th>
+                                <th>P&L</th>
+                            </tr>
+                        </thead>
+                        <tbody id="positions-tbody">
+                            <tr>
+                                <td>HYPE</td>
+                                <td><span class="side long">LONG</span></td>
+                                <td>120</td>
+                                <td>$38.50</td>
+                                <td>$39.21</td>
+                                <td class="positive">+$85</td>
+                            </tr>
+                            <tr>
+                                <td>BTC</td>
+                                <td><span class="side short">SHORT</span></td>
+                                <td>0.5</td>
+                                <td>$112k</td>
+                                <td>$111k</td>
+                                <td class="positive">+$500</td>
+                            </tr>
+                            <tr>
+                                <td>SOL</td>
+                                <td><span class="side long">LONG</span></td>
+                                <td>8</td>
+                                <td>$142</td>
+                                <td>$141</td>
+                                <td class="negative">-$8</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Bottom Row -->
+            <div class="reasoning-panel panel">
+                <h3>AI Reasoning & Logs</h3>
+                <div class="reasoning-cards" id="reasoning-cards">
+                    <div class="reasoning-card">
+                        <div class="card-header">
+                            <span class="ai-icon">🤖</span>
+                            <span class="asset">HYPE Analysis</span>
+                            <span class="timestamp">2 min ago</span>
+                        </div>
+                        <div class="card-content">
+                            <p>Bull bias - RSI oversold, funding positive</p>
+                            <div class="action-info">
+                                <span class="action">Action: HOLD</span>
+                                <span class="sl">SL: $37.50</span>
+                                <span class="tp">TP: $41.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reasoning-card">
+                        <div class="card-header">
+                            <span class="ai-icon">🤖</span>
+                            <span class="asset">BTC Analysis</span>
+                            <span class="timestamp">5 min ago</span>
+                        </div>
+                        <div class="card-content">
+                            <p>Neutral - Waiting for breakout</p>
+                            <div class="action-info">
+                                <span class="action">Action: MONITOR</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="trades-panel panel" data-widget="trades">
+                <h3>Recent Trades</h3>
+                <div class="table-container">
+                    <table class="trades-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Symbol</th>
+                                <th>Side</th>
+                                <th>Size</th>
+                                <th>Entry</th>
+                                <th>Exit</th>
+                                <th>P&L</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trades-tbody">
+                            <tr>
+                                <td>10:23</td>
+                                <td>BTC</td>
+                                <td><span class="side long">LONG</span></td>
+                                <td>0.3</td>
+                                <td>$110k</td>
+                                <td>$111k</td>
+                                <td class="positive">+$300</td>
+                            </tr>
+                            <tr>
+                                <td>09:45</td>
+                                <td>HYPE</td>
+                                <td><span class="side short">SHORT</span></td>
+                                <td>80</td>
+                                <td>$40.20</td>
+                                <td>$39.80</td>
+                                <td class="positive">+$32</td>
+                            </tr>
+                            <tr>
+                                <td>09:12</td>
+                                <td>SOL</td>
+                                <td><span class="side long">LONG</span></td>
+                                <td>10</td>
+                                <td>$140</td>
+                                <td>$139</td>
+                                <td class="negative">-$10</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="ai-logs-panel panel" data-widget="ai-logs">
+                <h3>AI Decision Logs</h3>
+                <div class="table-container">
+                    <table class="ai-logs-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Action</th>
+                                <th>Symbol/Side</th>
+                                <th>Notional</th>
+                                <th>Executed</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ai-logs-tbody">
+                            <!-- AI logs will be populated here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="performance-panel panel">
+                <h3>Performance Metrics</h3>
+                <div class="performance-grid">
+                    <div class="perf-item">
+                        <span class="perf-label">Avg Win</span>
+                        <span class="perf-value positive" id="avg-win">+2.1%</span>
+                    </div>
+                    <div class="perf-item">
+                        <span class="perf-label">Avg Loss</span>
+                        <span class="perf-value negative" id="avg-loss">-1.4%</span>
+                    </div>
+                    <div class="perf-item">
+                        <span class="perf-label">Profit Factor</span>
+                        <span class="perf-value" id="profit-factor">1.8</span>
+                    </div>
+                    <div class="perf-item">
+                        <span class="perf-label">Volatility</span>
+                        <span class="perf-value" id="volatility">12.3%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Status Bar -->
+        <footer class="status-bar">
+            <div class="status-content">
+                <span>Last Update: <span id="last-update">12:30:45</span></span>
+                <span>WebSocket: <span id="ws-status">🟢 Connected</span></span>
+                <span>API: <span id="api-status">🟢 Healthy</span></span>
+                <span>DB: <span id="db-status">🟢 Synced</span></span>
+            </div>
+        </footer>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>

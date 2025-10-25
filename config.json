@@ -1,0 +1,16 @@
+{
+    "hyperliquid": {
+      "account_address": "0xYOUR_WALLET_ADDRESS",
+      "secret_key": "0xYOUR_PRIVATE_KEY"
+    },
+    "deepseek": {
+      "api_key": "sk-your-deepseek-key"
+    },
+    "bot": {
+      "start_capital": 10000,
+      "assets": ["HYPE", "BTC", "SOL"],
+      "min_score": 80,
+      "max_leverage": 50,
+      "testnet": true
+    }
+}

@@ -1,0 +1,29 @@
+```json
+{
+  "rules": [
+    {
+      "name": "No Global Variables",
+      "description": "All state must be passed via classes or context. No `global` except in main loop for WS cache."
+    },
+    {
+      "name": "Async Only",
+      "description": "All I/O (API, WS, DB) must be async. No blocking calls."
+    },
+    {
+      "name": "Single Responsibility",
+      "description": "One file = one job. `engine.py` decides. `executor.py` trades. `logger.py` tracks."
+    },
+    {
+      "name": "JSON or Die",
+      "description": "DeepSeek must return JSON. Validate with schema before execution."
+    },
+    {
+      "name": "Log Every Breath",
+      "description": "Every decision, score, fill, PnL → DB + console. Arena-style: Track total value + last 14 trades."
+    },
+    {
+      "name": "Testnet First",
+      "description": "Default to testnet. Mainnet flag: `--live`"
+    }
+  ]
+}

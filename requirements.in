@@ -1,0 +1,47 @@
+# Core dependencies - Phase ε.1 Purification Pass
+# Minimal set of required packages
+
+# Web framework
+fastapi>=0.104.1
+uvicorn>=0.24.0
+starlette>=0.27.0
+
+# HTTP client
+httpx>=0.28.1
+aiohttp>=3.12.15
+
+# Data processing
+pandas>=2.1.3
+numpy>=1.24.3
+
+# Database
+sqlite3  # Built-in
+
+# Configuration
+python-dotenv>=1.0.1
+pydantic>=2.11.7
+pydantic-settings>=2.10.1
+
+# WebSocket
+websockets>=15.0.1
+
+# Hyperliquid SDK
+hyperliquid-python-sdk>=0.20.0
+
+# Ethereum/crypto
+eth-account>=0.11.3
+web3>=6.18.0
+
+# Async utilities
+asyncio  # Built-in
+
+# Logging
+loguru>=0.7.3
+
+# Testing
+pytest>=8.4.1
+pytest-asyncio>=1.1.0
+
+# Development tools
+ruff>=0.1.0
+mypy>=1.0.0

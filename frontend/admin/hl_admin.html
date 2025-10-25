@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>HL Admin</title>
+    <style>
+      body { font-family: ui-sans-serif, system-ui; margin: 24px; }
+      pre { background: #111; color: #0f0; padding: 12px; border-radius: 8px; overflow:auto; }
+      button { padding: 10px 16px; border-radius: 8px; border: none; background: #0aa; color: #fff; cursor: pointer; }
+      button:disabled { background: #777; cursor: wait; }
+      .admin-banner { background: #ff6b6b; color: white; padding: 8px; border-radius: 4px; margin-bottom: 16px; text-align: center; font-weight: bold; }
+    </style>
+  </head>
+  <body>
+    <div class="admin-banner">⚠️ Admin / Non-prod</div>
+    <h1>Hyperliquid Admin</h1>
+    <p>
+      <button id="btnPreflight">Preflight</button>
+      <button id="btnRoundTrip">$15 IOC Round-Trip (ETH)</button>
+    </p>
+    <h3>Response</h3>
+    <pre id="out">(click a button)</pre>
+    <script>
+      const out = document.getElementById('out');
+      const btn1 = document.getElementById('btnPreflight');
+      const btn2 = document.getElementById('btnRoundTrip');
+
+      async function hit(url, opts) {
+        out.textContent = 'Loading...';
+        try {
+          const res = await fetch(url, opts);
+          const text = await res.text();
+          try {
+            out.textContent = JSON.stringify(JSON.parse(text), null, 2);
+          } catch {
+            out.textContent = text;
+          }
+        } catch (e) {
+          out.textContent = String(e);
+        }
+      }
+
+      btn1.onclick = () => hit('/hl/preflight');
+      btn2.onclick = () => hit('/hl/ioc_roundtrip', { method: 'POST' });
+    </script>
+  </body>
+</html>
